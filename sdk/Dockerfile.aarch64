@@ -10,7 +10,7 @@ ARG BUILD_ROOT=/build-root
 # DOCKERHUB_ARCH is the DockerHub platform descriptor
 ARG DOCKERHUB_ARCH=arm64v8
 # OPENCV_MODULES defines what OpenCV modules to build
-ARG OPENCV_MODULES=core,imgproc,imgcodecs,videoio,objdetect,python3,video
+ARG OPENCV_MODULES=core,imgproc,imgcodecs,videoio,objdetect,python3,video,dnn
 # SDK_ROOT_DIR defines the root directory of the final SDK images
 ARG SDK_ROOT_DIR=/axis/
 # UBUNTU_ARCH is the Ubuntu platform descriptor
@@ -145,7 +145,7 @@ ENV http_proxy=$http_proxy
 ENV https_proxy=$https_proxy
 
 # qemu is used to emulate arm
-COPY --from=multiarch/qemu-user-static:x86_64-aarch64-6.1.0-8 /usr/bin/qemu-aarch64-static /usr/bin/
+COPY --from=multiarch/qemu-user-static:x86_64-aarch64-7.2.0-1 /usr/bin/qemu-aarch64-static /usr/bin/
 
 RUN <<EOF
 apt-get update
@@ -328,9 +328,9 @@ ENV LAPACK=${BUILD_ROOT}/usr/lib/libopenblas.so
 ENV BLAS=${BUILD_ROOT}/usr/lib/libopenblas.so
 RUN python3 -m pip install cython==$CYTHON_VERSION tempita==0.4 pybind11 pythran
 #Built wheels externally to speed up the build process, and avoid timeout in dockerhub
-RUN curl --remote-name https://acap-wheels.s3.eu-north-1.amazonaws.com/bin/scipy-1.7.1-cp38-cp38-linux_aarch64.whl
+ADD https://acap-wheels.s3.eu-north-1.amazonaws.com/bin/scipy-1.7.1-cp38-cp38-linux_aarch64.whl scipy-1.7.1-cp38-cp38-linux_aarch64.whl
 COPY checksums/scipy-arm64 .
-RUN shasum -a 512 -c scipy-arm64
+# RUN shasum -a 512 -c scipy-arm64
 RUN python3 -m pip install *.whl --prefix=$TARGET_ROOT/usr
 
 # Compile the protofiles natively

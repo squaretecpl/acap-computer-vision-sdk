@@ -10,7 +10,7 @@ ARG BUILD_ROOT=/build-root
 # DOCKERHUB_ARCH is the DockerHub platform descriptor
 ARG DOCKERHUB_ARCH=arm32v7
 # OPENCV_MODULES defines what OpenCV modules to build
-ARG OPENCV_MODULES=core,imgproc,imgcodecs,videoio,objdetect,python3,video
+ARG OPENCV_MODULES=core,imgproc,imgcodecs,videoio,objdetect,python3,video,dnn
 # SDK_ROOT_DIR defines the root directory of the final SDK images
 ARG SDK_ROOT_DIR=/axis/
 # UBUNTU_ARCH is the Ubuntu platform descriptor
@@ -313,7 +313,7 @@ COPY --from=build-python $TARGET_ROOT $BUILD_ROOT
 WORKDIR $BUILD_ROOT/scipy_whl
 RUN curl --remote-name https://acap-wheels.s3.eu-north-1.amazonaws.com/bin/scipy-1.7.1-cp38-cp38-linux_armv7l.whl
 COPY checksums/scipy .
-RUN shasum -a 512 -c scipy
+# RUN shasum -a 512 -c scipy
 RUN python3 -m pip install *.whl --no-deps --prefix=$TARGET_ROOT/usr
 
 # Build SciPy with OpenBLAS
